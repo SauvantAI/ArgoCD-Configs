@@ -1,48 +1,10 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: sample-app-config
+  name: creditsea-app-config
 data:
-  index.html: |
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <title>ArgoCD Sample Application</title>
-        <style>
-            body {
-                font-family: Arial, sans-serif;
-                margin: 0;
-                padding: 30px;
-                background-color: #f5f5f5;
-            }
-            .container {
-                max-width: 800px;
-                margin: 0 auto;
-                background-color: white;
-                padding: 30px;
-                border-radius: 8px;
-                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            }
-            h1 {
-                color: #3066be;
-            }
-            .status {
-                background-color: #e6f7ff;
-                border-left: 4px solid #1890ff;
-                padding: 15px;
-                margin: 20px 0;
-            }
-        </style>
-    </head>
-    <body>
-        <div class="container">
-            <h1>ArgoCD Sample Application</h1>
-            <p>This is a sample application deployed with ArgoCD.</p>
-            <div class="status">
-                <p><strong>Status:</strong> Running</p>
-                <p><strong>Version:</strong> 1.0.0</p>
-                <p><strong>Environment:</strong> Development</p>
-            </div>
-        </div>
-    </body>
-    </html>
+  config.json: |
+    {
+      "version": "1.0.0",
+      "environment": "development"
+    }
