@@ -4,12 +4,8 @@ metadata:
   name: creditsea-app-service
   labels:
     app: creditsea-app
-  annotations:
-    service.beta.kubernetes.io/aws-load-balancer-type: nlb
-    service.beta.kubernetes.io/aws-load-balancer-healthcheck-protocol: HTTP
-    service.beta.kubernetes.io/aws-load-balancer-healthcheck-path: "/"
 spec:
-  type: LoadBalancer
+  type: ClusterIP  # Change from LoadBalancer to ClusterIP
   ports:
     - port: 80
       targetPort: 8080
