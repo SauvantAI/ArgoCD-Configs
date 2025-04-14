@@ -11,7 +11,7 @@ This will setup the argocd-image-updater manifest
 
 After applying it change the ArgoCD Application manifest using:
 ```sh
-kubectl edit -n argocd app
+kubectl edit -n argocd creditsea-backend
 ```
 and add these fields: 
 
