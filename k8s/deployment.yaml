@@ -2,23 +2,26 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: creditsea-app
-  annotations:
-    argocd-image-updater.argoproj.io/image-list: creditsea=533267250939.dkr.ecr.ap-south-1.amazonaws.com/creditsea-app
-    argocd-image-updater.argoproj.io/creditsea.update-strategy: latest
   labels:
     app: creditsea-app
 spec:
+  revisionHistoryLimit: 0 # delete old replicaSet after reaching "complete state"
   replicas: 1
   selector:
     matchLabels:
       app: creditsea-app
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
   template:
     metadata:
       labels:
         app: creditsea-app
     spec:
       tolerations:
-        - key: CriticalAddonsOnly
+        - key: CriticalAddonsOnly # this ensures it runs inside karpenter 
           operator: Equal
           value: "true"
           effect: NoSchedule
@@ -33,7 +36,7 @@ spec:
               memory: 256Mi
               cpu: 200m
             limits:
-              memory: 2Gi
+              memory: 1.5Gi
               cpu: 500m
           envFrom:
             - secretRef:
