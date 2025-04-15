@@ -6,7 +6,7 @@ metadata:
     app: creditsea-app
 spec:
   revisionHistoryLimit: 0 # delete old replicaSet after reaching "complete state"
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: creditsea-app

@@ -12,11 +12,6 @@ spec:
       labels:
         app: grafana
     spec:
-      tolerations:
-      - key: CriticalAddonsOnly
-        operator: Equal
-        value: "true"
-        effect: NoSchedule
       containers:
       - name: grafana
         image: grafana/grafana:11.6.0
