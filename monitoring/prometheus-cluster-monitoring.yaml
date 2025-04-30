@@ -216,7 +216,8 @@ spec:
         configMap:
           name: prometheus-config
       - name: prometheus-storage
-        emptyDir: {}
+        emptyDir:
+          sizeLimit: 10Gi
 ---
 apiVersion: v1
 kind: Service
