@@ -1,0 +1,205 @@
+---
+# Namespace for Keel
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: keel
+---
+# Service Account for Keel
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: keel
+  namespace: keel
+---
+# RBAC - ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: keel
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - namespaces
+      - pods
+      - replicationcontrollers
+      - secrets
+      - configmaps
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - "extensions"
+      - "apps"
+    resources:
+      - deployments
+      - statefulsets
+      - daemonsets
+    verbs:
+      - get
+      - list
+      - watch
+      - update
+  - apiGroups:
+      - "batch"
+    resources:
+      - cronjobs
+      - jobs
+    verbs:
+      - get
+      - list
+      - watch
+      - update
+  - apiGroups:
+      - ""
+    resources:
+      - endpoints
+    verbs:
+      - get
+      - list
+      - watch
+---
+# RBAC - ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: keel
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: keel
+subjects:
+  - kind: ServiceAccount
+    name: keel
+    namespace: keel
+---
+# ConfigMap for Keel
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: keel-config
+  namespace: keel
+data:
+  config.yaml: |
+    # Keel configuration
+    debug: false
+    polling:
+      enabled: true
+---
+# Secret for Keel
+apiVersion: v1
+kind: Secret
+metadata:
+  name: keel-secret
+  namespace: keel
+type: Opaque
+stringData:
+  # Uncomment and fill in if you need authentication
+  # BASIC_AUTH_USER: admin
+  # BASIC_AUTH_PASSWORD: admin
+---
+# Keel Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: keel
+  namespace: keel
+  labels:
+    app: keel
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: keel
+  template:
+    metadata:
+      labels:
+        app: keel
+    spec:
+      serviceAccountName: keel
+      containers:
+        - name: keel
+          image: keelhq/keel:latest
+          imagePullPolicy: Always
+          volumeMounts:
+            - name: keel-data
+              mountPath: /data
+          env:
+            # Enable polling trigger
+            - name: POLL
+              value: "1"
+            # Enable debug mode if needed
+            - name: DEBUG
+              value: "false"
+            # Enable Helm provider if needed
+            - name: HELM_PROVIDER
+              value: "0"  # Set to "1" to enable Helm provider
+            # Enable basic authentication if needed
+            - name: BASIC_AUTH_USER
+              valueFrom:
+                secretKeyRef:
+                  name: keel-secret
+                  key: BASIC_AUTH_USER
+                  optional: true
+            - name: BASIC_AUTH_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: keel-secret
+                  key: BASIC_AUTH_PASSWORD
+                  optional: true
+            - name: XDG_DATA_HOME
+              value: "/data"
+          ports:
+            - containerPort: 9300
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 9300
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 9300
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          resources:
+            limits:
+              cpu: 100m
+              memory: 128Mi
+            requests:
+              cpu: 50m
+              memory: 64Mi
+      volumes:
+        - name: keel-data
+          emptyDir: {}
+---
+# Service for Keel
+apiVersion: v1
+kind: Service
+metadata:
+  name: keel
+  namespace: keel
+spec:
+  ports:
+    - port: 9300
+      targetPort: 9300
+      protocol: TCP
+  selector:
+    app: keel
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: keel-ui
+  namespace: keel
+spec:
+  type: ClusterIP  
+  ports:
+    - port: 9300
+      targetPort: 9300
+      protocol: TCP
+  selector:
+    app: keel
