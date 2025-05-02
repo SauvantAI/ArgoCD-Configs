@@ -4,6 +4,10 @@ metadata:
   name: creditsea-app
   labels:
     app: creditsea-app
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::533267250939:role/ArgocdImageUpdaterRole
+    keel.sh/policy: minor 
+    keel.sh/trigger: poll
 spec:
   revisionHistoryLimit: 0 # delete old replicaSet after reaching "complete state"
   replicas: 2
