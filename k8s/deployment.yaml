@@ -24,8 +24,19 @@ spec:
       labels:
         app: creditsea-app
     spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: node.kubernetes.io/instance-type
+                operator: In
+                values:
+                - m5.large
+                - c5.large
+                - r5.large
       tolerations:
-        - key: CriticalAddonsOnly # this ensures it runs inside karpenter 
+        - key: CriticalAddonsOnly # HACK: this ensures it runs inside karpenter 
           operator: Equal
           value: "true"
           effect: NoSchedule
@@ -42,6 +53,19 @@ spec:
             limits:
               memory: 1.5Gi
               cpu: 500m
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+            - name: NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
           envFrom:
             - secretRef:
                 name: creditsea-config-secret
