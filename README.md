@@ -166,3 +166,4 @@ This repository follows the GitOps methodology:
 - [Prometheus Documentation](https://prometheus.io/docs/introduction/overview/)
 - [Grafana Documentation](https://grafana.com/docs/)
 - [Grafana Alloy Documentation](https://grafana.com/docs/alloy/latest/)
+- [Keel](https://keel.sh/docs/)
